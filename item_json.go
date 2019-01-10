@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-// jHost is a private map for the Zabbix API Host object.
-// See: https://www.zabbix.com/documentation/2.2/manual/api/reference/host/object
+// jItem is a private map for the Zabbix API Host object.
+// See: https://www.zabbix.com/documentation/4.0/manual/api/reference/item/get
 type jItem struct {
 	HostID    string      `json:"hostid"`
 	ItemID    string      `json:"itemid"`
@@ -28,12 +28,6 @@ func (c *jItem) Item() (*Item, error) {
 	item.LastClock = c.LastClock
 	item.LastValue = c.LastValue
 	item.Source = c.Source
-	/*
-		host.Source, err = strconv.Atoi(c.Flags)
-		if err != nil {
-			return nil, fmt.Errorf("Error parsing Host Flags: %v", err)
-		}
-	*/
 	item.Source = c.Source
 	return item, nil
 }

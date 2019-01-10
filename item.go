@@ -4,17 +4,9 @@ import (
 	"fmt"
 )
 
-const (
-	// HostSourceDefault indicates that a Host was created in the normal way.
-	HostSourceDefault = 0
-
-	// HostSourceDiscovery indicates that a Host was created by Host discovery.
-	HostSourceDiscovery = 4
-)
-
-// Host represents a Zabbix Host returned from the Zabbix API.
+// Item represents a Zabbix Item returned from the Zabbix API.
 //
-// See: https://www.zabbix.com/documentation/2.2/manual/config/hosts
+// See: https://www.zabbix.com/documentation/4.0/manual/api/reference/item/object
 type Item struct {
 	// HostID is the unique ID of the Host.
 	HostID string
@@ -22,26 +14,26 @@ type Item struct {
 	// ItemID is the unique ID of the Item.
 	ItemID string
 
-	// Itemname is the technical name of the Host.
+	// Itemname is the technical name of the Item.
 	ItemName string
 
-	// DisplayName is the visible name of the Host.
+	// ItemDescr is the description of the Item.
 	ItemDescr string
 
-	// DisplayName is the visible name of the Host.
+	// todo LastClock is the visible name of the Item.
 	LastClock int64
 
-	// DisplayName is the visible name of the Host.
+	// todo DisplayName is the visible name of the Host.
 	LastValue int
 
-	// Source is the origin of the Host and must be one of the HostSource
+	// todo Source is the origin of the Host and must be one of the HostSource
 	// constants.
 	Source int
 }
 
-// HostGetParams represent the parameters for a `host.get` API call.
+// todo ItemGetParams represent the parameters for a `item.get` API call.
 //
-// See: https://www.zabbix.com/documentation/2.2/manual/api/reference/host/get#parameters
+// See: https://www.zabbix.com/documentation/4.0/manual/api/reference/item/get
 type ItemGetParams struct {
 	GetParameters
 	// GroupIDs filters search results to hosts that are members of the given
@@ -126,31 +118,31 @@ type ItemGetParams struct {
 	SelectTriggers        SelectQuery `json:"selectTriggers,omitempty"`
 }
 
-// GetHosts queries the Zabbix API for Hosts matching the given search
+// GetItems queries the Zabbix API for Items matching the given search
 // parameters.
 //
 // ErrEventNotFound is returned if the search result set is empty.
 // An error is returned if a transport, parsing or API error occurs.
 func (c *Session) GetItems(params ItemGetParams) ([]Item, error) {
-	hosts := make([]jHost, 0)
-	err := c.Get("host.get", params, &hosts)
+	items := make([]jItem, 0)
+	err := c.Get("item.get", params, &items)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(hosts) == 0 {
+	if len(items) == 0 {
 		return nil, ErrNotFound
 	}
 
 	// map JSON Events to Go Events
-	out := make([]Host, len(hosts))
-	for i, jhost := range hosts {
-		host, err := jhost.Host()
+	out := make([]Item, len(items))
+	for i, jitem := range items {
+		item, err := jitem.Item()
 		if err != nil {
-			return nil, fmt.Errorf("Error mapping Host %d in response: %v", i, err)
+			return nil, fmt.Errorf("Error mapping Item %d in response: %v", i, err)
 		}
 
-		out[i] = *host
+		out[i] = *item
 	}
 
 	return out, nil
